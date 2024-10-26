@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List - Gestionnaire de Tâches</title>
+
+    <!-- Lien vers FontAwesome via CDNJS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- Ton fichier CSS pour la to-do list -->
+    <link rel="stylesheet" href="todolist.css">
+</head>
+<body>
+<nav class="navbar">
+    <ul>
+        <li><a href="../todolist/todolist.html">To-Do List</a></li>
+        <li><a href="../routine/routine.html">Routine</a></li>
+        <li><a href="../wlhabit/wlhabit.html">Habitude</a></li>
+    </ul>
+</nav>
+
+<header>
+    <h1>To-Do List</h1>
+</header>
+
+<main>
+    <section id="calendar">
+        <!-- Intégrer un calendrier si nécessaire -->
+    </section>
+    <div id="taskForm">
+        <input type="text" id="newTask" placeholder="Ajouter une nouvelle tâche" required>
+        <button type="submit" id="addTask">Ajouter</button>
+    </div>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <span id="progressPercentage">0%</span>
+    </div>
+
+    <!-- Liste des tâches -->
+    <ul id="tasks">
+        <!-- Tâches seront ajoutées ici dynamiquement -->
+    </ul>
+</main>
+
+<!-- Inclusion du fichier JavaScript Firebase Config -->
+<script type="module" src="../js/firebase-config.js"></script>
+
+<!-- Inclusion du fichier JavaScript pour To-Do List -->
+<script type="module" src="../js/todolist.js"></script>
+</body>
+</html>

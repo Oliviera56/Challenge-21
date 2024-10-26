@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Métadonnées -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suivi de Routine</title>
+    <meta name="description" content="Challenge 21 - Suivez votre routine quotidienne de manière simple et efficace. Prenez le contrôle de votre quotidien avec un outil intuitif conçu pour simplifier votre routine.">
+    <meta name="keywords" content="Challenge 21, routine, productivité, suivi, efficace">
+    <meta name="author" content="VotreNom">
+
+    <!-- Liens vers les polices et les icônes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Feuilles de style -->
+    <link rel="stylesheet" href="routine.css">
+</head>
+<body>
+    <!-- En-tête avec la barre de navigation -->
+    <header>
+        <div class="container">
+            <h1>Suivi de Routine</h1>
+            <nav>
+                <a href="../routine-create/routine-create.html" class="nav-button">Créer une Routine</a>
+                <button id="resetButton" class="nav-button">Réinitialiser</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteneur de la barre de progression globale -->
+    <div id="globalProgressContainer" class="progress-bar">
+        <div class="progress"></div>
+    </div>
+    <div id="globalPercentageContainer">
+        <span id="globalPercentage">0.0%</span>
+    </div>
+
+    <!-- Grille des routines sur 21 jours -->
+    <main>
+        <div id="routineGrid"></div>
+    </main>
+
+    <!-- Inclusion du fichier JavaScript -->
+    <script src="routine.js"></script>
+</body>
+</html>

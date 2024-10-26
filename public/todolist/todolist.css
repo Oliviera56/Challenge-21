@@ -1,0 +1,294 @@
+/* Définition des couleurs globales */
+:root {
+    --primary-color: #2c3e50;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --bg-color: #000;
+    --text-color: #fff;
+    --button-hover-color: #34495e;
+}
+
+/* Style global */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+}
+
+/* En-tête */
+header {
+    text-align: center;
+    padding: 30px 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-bottom: 1px solid #333;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: var(--success-color);
+}
+
+/* Formulaire d'ajout de tâche */
+#taskForm {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#taskForm input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#taskForm button {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+#taskForm button:hover {
+    background-color: var(--button-hover-color);
+}
+
+/* Style des tâches */
+#tasks {
+    list-style-type: none;
+    padding: 0;
+}
+
+#tasks li {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #fff;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Nom de la tâche */
+#tasks li span {
+    z-index: 1;
+    color: #000;
+    flex: 1;
+    padding: 10px;
+}
+
+/* Animation du bouton vert (valider) */
+.task-left {
+    flex: 1; /* Utiliser tout l'espace restant */
+    padding: 15px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    transition: color 0.1s ease, transform 0.3s ease;
+    z-index: 1;
+    color: #000;
+}
+
+.task-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--success-color); /* Remplissage vert */
+    z-index: -1;
+    transition: left 0.5s ease-out;
+}
+
+.task-left:hover {
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.task-left:hover::before {
+    left: 0;
+}
+
+/* Animation du bouton rouge (supprimer) */
+.task-right {
+    flex: 0.05; /* 5% de l'espace */
+    padding: 15px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    transition: color 0.1s ease, transform 0.3s ease;
+    z-index: 1;
+    color: #000;
+}
+
+.task-right::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--danger-color);
+    z-index: -1;
+    transition: right 0.5s ease-out;
+}
+
+.task-right:hover {
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.task-right:hover::before {
+    right: 0;
+}
+
+/* Conserver la couleur de l'icône poubelle dans les tâches complétées */
+#tasks li.completed .task-right i {
+    color: #000; /* Garde l'icône de la poubelle noire même quand validée */
+}
+
+#tasks li.completed .task-right:hover i {
+    color: #fff; /* Change la couleur de l'icône au hover si nécessaire */
+}
+
+/* Tâches complétées */
+#tasks li.completed {
+    background-color: var(--success-color);
+    color: #fff;
+    text-decoration: line-through;
+    transform: scale(1);
+    position: relative;
+}
+
+/* Barre de progression */
+.progress-container {
+    margin-top: 10px;
+    width: 100%;
+    background-color: #333;
+    border-radius: 5px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: var(--success-color);
+    width: 0%;
+    transition: width 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    overflow: hidden; /* Empêche tout débordement visuel */
+}
+
+/* Barre de navigation */
+.navbar {
+    background-color: #333;
+    padding: 10px;
+    text-align: center;
+}
+
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.navbar ul li {
+    display: inline;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #444;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.navbar ul li a:hover {
+    background-color: var(--success-color);
+    transform: scale(1.1);
+    color: #fff;
+}
+
+/* Style for the input field animation */
+#taskForm input[type="text"] {
+    padding: 10px;
+    font-size: 16px;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    outline: none;
+    background-color: #fff;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+#taskForm input[type="text"]:focus {
+    border-color: var(--success-color);
+}
+
+#taskForm input[type="text"]::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--success-color);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+#taskForm input[type="text"]:focus::before {
+    transform: scaleX(1);
+}
+
+/* Ajout pour l'input lors de l'édition */
+.task-edit-input {
+    border: 1px solid var(--primary-color);
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+    box-sizing: content-box; /* Pour ajuster dynamiquement selon le contenu */
+}
+
+.task-edit-input:focus {
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+/* Texte modifiable */
+.editable-task-text {
+    cursor: text;
+}

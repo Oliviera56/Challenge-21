@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <!-- Métadonnées -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 21 - Accueil</title>
+  <meta name="description" content="Challenge 21 - Suivez votre routine quotidienne de manière simple et efficace. Prenez le contrôle de votre quotidien avec un outil intuitif conçu pour simplifier votre routine.">
+  <meta name="keywords" content="Challenge 21, routine, productivité, suivi, efficace">
+  <meta name="author" content="VotreNom">
+
+  <!-- Liens vers les polices et les icônes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Feuilles de style Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Styles personnalisés -->
+  <style>
+    :root {
+      --background-color: #0a0a0a;
+      --text-color: #fff;
+      --primary-color: #28a745;
+      --highlight-color: #28a745;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: rgba(10, 10, 10, 0.9);
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    nav .navbar-brand {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    nav a {
+      color: var(--text-color);
+      padding: 10px 15px;
+      text-decoration: none;
+      text-transform: uppercase;
+      font-weight: 600;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: var(--highlight-color);
+    }
+
+    /* Contenu principal */
+    .main-content {
+      flex: 1;
+      text-align: center;
+      padding-top: 150px;
+      padding-bottom: 100px;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(-50px);
+      animation: fadeInDown 2.5s ease-out forwards;
+    }
+
+    .lead {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      color: #ddd;
+      opacity: 0;
+      transform: translateX(-50px);
+      animation: slideInFromLeft 2.5s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    .highlight {
+      color: var(--highlight-color);
+      transition: color 0.3s ease;
+    }
+
+    .highlight:hover {
+      color: #fff;
+    }
+
+    /* Bouton personnalisé */
+    .btn-futuristic {
+      background-color: var(--highlight-color);
+      color: #fff;
+      border: 2px solid var(--highlight-color);
+      padding: 12px 36px;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.1s ease, transform 0.3s ease;
+      z-index: 1;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      opacity: 0;
+      transform: scale(0.95);
+      animation: fadeInScale 1s ease-out forwards;
+      animation-delay: 1.5s;
+      margin-top: 30px;
+    }
+
+    .btn-futuristic::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 100%;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      z-index: -1;
+      transition: right 0.5s ease-out;
+    }
+
+    .btn-futuristic:hover {
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    .btn-futuristic:hover::before {
+      right: 0;
+    }
+
+    /* Pied de page */
+    footer {
+      background-color: rgba(10, 10, 10, 0.9);
+      text-align: center;
+      padding: 10px 0;
+      color: var(--text-color);
+      font-size: small;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideInFromLeft {
+      0% {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeInScale {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Responsivité */
+    @media (max-width: 992px) {
+      .title {
+        font-size: 2.5rem;
+      }
+
+      .lead {
+        font-size: 1.3rem;
+      }
+
+      .btn-futuristic {
+        padding: 10px 30px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 2rem;
+      }
+
+      .lead {
+        font-size: 1.1rem;
+      }
+
+      .btn-futuristic {
+        padding: 8px 24px;
+        font-size: 0.9rem;
+      }
+
+      .main-content {
+        padding-top: 130px;
+        padding-bottom: 80px;
+      }
+
+      nav .navbar-brand {
+        font-size: 1.3rem;
+      }
+
+      nav a {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .title {
+        font-size: 1.8rem;
+      }
+
+      .lead {
+        font-size: 1rem;
+      }
+
+      .btn-futuristic {
+        padding: 6px 20px;
+        font-size: 0.8rem;
+      }
+
+      nav .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      nav a {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+
+      .main-content {
+        padding-top: 120px;
+        padding-bottom: 60px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="accueil.html">Challenge 21</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Basculer la navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="signup.html">S'inscrire</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="signin.html">Se connecter</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenu principal -->
+  <main class="main-content">
+    <div class="container">
+      <h1 class="title">Challenge 21</h1>
+      <p class="lead">Prenez le contrôle de votre quotidien avec un outil <span class="highlight">simple</span> et
+        <span class="highlight">efficace</span>.</p>
+      <!-- Bouton pour ouvrir le modal -->
+      <button id="startButton" class="btn btn-futuristic" data-bs-toggle="modal" data-bs-target="#emailModal">Commencer maintenant</button>
+    </div>
+  </main>
+
+  <!-- Pied de page -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Challenge 21. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <!-- Modal de Vérification de l'Email -->
+  <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 class="modal-title" id="emailModalLabel">Commencer</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+        </div>
+        <div class="modal-body">
+          <form id="emailForm">
+            <div class="mb-3">
+              <label for="userEmail" class="form-label">Adresse Email</label>
+              <input type="email" class="form-control" id="userEmail" required>
+            </div>
+            <div id="emailError" class="text-danger mb-3" style="display: none;">Veuillez entrer une adresse email valide.</div>
+            <button type="submit" class="btn btn-primary">Vérifier</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inclusion des fichiers JavaScript -->
+  <!-- Inclusion du fichier JavaScript Firebase Config (si vous souhaitez externaliser) -->
+  <!-- <script type="module" src="js/firebase-config.js"></script> -->
+
+  <!-- Inclusion du script inline pour la logique de la page d'accueil -->
+  <script type="module">
+    // Importer les fonctions nécessaires de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, fetchSignInMethodsForEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+    // Configuration Firebase (Vos informations)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyk8bXkga9trYpjnLsSGV5RVjLyIH6HIs",
+      authDomain: "challenge-21-5dc3b.firebaseapp.com",
+      projectId: "challenge-21-5dc3b",
+      storageBucket: "challenge-21-5dc3b.appspot.com",
+      messagingSenderId: "1055997037321",
+      appId: "1:1055997037321:web:64e2b003c74ee516ef61d8",
+      measurementId: "G-1YPYR46K7N"
+    };
+
+    // Initialiser Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Références aux éléments du DOM
+    const emailForm = document.getElementById("emailForm");
+    const userEmailInput = document.getElementById("userEmail");
+    const emailError = document.getElementById("emailError");
+    const emailModalElement = document.getElementById('emailModal');
+    const emailModal = new bootstrap.Modal(emailModalElement);
+
+    // Fonction de validation de l'email
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+    // Gestion de la soumission du formulaire d'email
+    emailForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = userEmailInput.value.trim();
+
+      // Validation de l'email
+      if (!email || !validateEmail(email)) {
+        emailError.textContent = "Veuillez entrer une adresse email valide.";
+        emailError.style.display = "block";
+        return;
+      }
+
+      try {
+        // Vérifier les méthodes de connexion pour l'email donné
+        const methods = await fetchSignInMethodsForEmail(auth, email);
+
+        if (methods.length > 0) {
+          // L'email est déjà enregistré, rediriger vers la page de connexion
+          emailModal.hide();
+          window.location.href = "signin.html";
+        } else {
+          // L'email n'est pas enregistré, rediriger vers la page d'inscription
+          emailModal.hide();
+          window.location.href = "signup.html";
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de l'email :", error);
+        emailError.textContent = "Une erreur est survenue. Veuillez réessayer.";
+        emailError.style.display = "block";
+      }
+    });
+
+    // Gestion de l'état d'authentification de l'utilisateur
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Si l'utilisateur est connecté, rediriger vers routine/routine.html
+        window.location.href = "routine/routine.html";
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

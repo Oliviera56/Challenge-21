@@ -1,0 +1,419 @@
+/* Palette de couleurs inspirée */
+:root {
+    --background-color: #0a0a0a;
+    --text-color: #fff;
+    --primary-color: #28a745;
+    --accent-color: #28a745;
+    --highlight-color: #28a745;
+    --button-hover-color: #1e7e34;
+    --danger-color: #dc3545;
+    --neutral-color: #6c757d;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Style global */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-size: clamp(1rem, 2vw, 1.2rem); /* Typographie réactive */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* En-tête */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: rgba(10, 10, 10, 0.9);
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+header .container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Permet le wrapping sur petits écrans */
+}
+
+header h1 {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    font-weight: 700;
+    margin: 0;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+}
+
+/* Style pour le bouton de navigation */
+.nav-button {
+    text-decoration: none;
+    color: var(--text-color);
+    background-color: var(--accent-color);
+    padding: 8px 16px;
+    border-radius: 50px;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 2px solid var(--accent-color);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background-color: var(--text-color);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.nav-button:hover {
+    color: var(--background-color);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.nav-button:hover::before {
+    left: 0;
+}
+
+/* Conteneur principal */
+main {
+    padding-top: 100px;
+    padding-bottom: 40px;
+}
+
+/* Barre de progression globale */
+#globalProgressContainer {
+    width: 80%;
+    height: 15px;
+    background-color: var(--neutral-color);
+    border-radius: 10px;
+    margin: 80px auto 0 auto;
+    overflow: hidden;
+    position: relative;
+}
+
+#globalProgressContainer .progress {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 0;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Conteneur pour le pourcentage global */
+#globalPercentageContainer {
+    width: 80%;
+    margin: 5px auto 20px auto;
+    text-align: right;
+}
+
+#globalPercentageContainer #globalPercentage {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+/* Grille pour les 21 jours */
+#routineGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 colonnes */
+    gap: 15px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Style pour chaque jour */
+.routine-day {
+    background-color: #111;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.2, 1, 0.22, 1), box-shadow 0.4s cubic-bezier(0.2, 1, 0.22, 1);
+    min-height: 100px;
+    opacity: 0;
+    animation: fadeInUp 0.5s forwards;
+    animation-delay: calc(0.05s * var(--delay));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.routine-day::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(40, 167, 69, 0.2) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s ease, height 0.5s ease;
+}
+
+.routine-day:hover::before {
+    width: 200%;
+    height: 200%;
+}
+
+.routine-day h2 {
+    font-size: 1rem;
+    margin: 0;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.routine-day:hover h2 {
+    color: var(--highlight-color);
+}
+
+.routine-day:hover {
+    transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+    box-shadow: 0 15px 25px var(--shadow-color);
+    background-color: #1c1c1c;
+}
+
+/* Pourcentage de chaque jour */
+.routine-day .day-percentage {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    align-self: flex-end;
+    transition: color 0.3s ease;
+}
+
+.routine-day:hover .day-percentage {
+    color: var(--highlight-color);
+}
+
+/* Plein écran pour les missions */
+.full-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(10, 10, 10, 0.95);
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    padding: 80px 20px 40px 20px;
+    overflow-y: auto;
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.full-screen h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.missions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Style amélioré pour les missions */
+.mission-item {
+    background-color: #1a1a1a;
+    padding: 15px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mission-item::before,
+.mission-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+.mission-item::before {
+    left: 0;
+    background-color: var(--primary-color);
+    opacity: 0;
+}
+
+.mission-item::after {
+    right: 0;
+    background-color: var(--danger-color);
+    opacity: 0;
+}
+
+.mission-item.hover-validated::before {
+    opacity: 0.2;
+}
+
+.mission-item.hover-failed::after {
+    opacity: 0.2;
+}
+
+.mission-item:hover {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+.mission-item.validated {
+    background-color: rgba(40, 167, 69, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.mission-item.failed {
+    background-color: rgba(220, 53, 69, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.mission-item h3 {
+    font-size: 1.2rem;
+    margin: 0 0 5px;
+}
+
+.mission-item p {
+    margin: 0;
+    color: #ccc;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsivité */
+@media (max-width: 1200px) {
+    #routineGrid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    #routineGrid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    header .container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav {
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+    }
+
+    .nav-button {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .routine-day h2 {
+        font-size: 1rem;
+    }
+
+    #routineGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .routine-day .day-percentage {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    #routineGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .nav-button {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+
+    .routine-day h2 {
+        font-size: 0.9rem;
+    }
+
+    .routine-day .day-percentage {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 400px) {
+    #routineGrid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .nav-button {
+        font-size: 0.6rem;
+        padding: 4px 8px;
+    }
+
+    .routine-day h2 {
+        font-size: 0.8rem;
+    }
+
+    .routine-day .day-percentage {
+        font-size: 0.6rem;
+    }
+}

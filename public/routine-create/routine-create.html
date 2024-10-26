@@ -1,0 +1,381 @@
+<!-- routine-create.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Métadonnées et autres liens inchangés -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Créer ou Modifier une Routine</title>
+    <!-- Inclusion du fichier CSS -->
+    <link rel="stylesheet" href="routine-create.css">
+    <!-- Inclusion de Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Inclusion de SortableJS pour le drag-and-drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Importer les fonctions nécessaires de Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyk8bXkga9trYpjnLsSGV5RVjLyIH6HIs",
+            authDomain: "challenge-21-5dc3b.firebaseapp.com",
+            projectId: "challenge-21-5dc3b",
+            storageBucket: "challenge-21-5dc3b.appspot.com",
+            messagingSenderId: "1055997037321",
+            appId: "1:1055997037321:web:64e2b003c74ee516ef61d8",
+            measurementId: "G-1YPYR46K7N"
+        };
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const firestore = getFirestore(app);
+
+        // Références aux éléments du DOM
+        const routineForm = document.getElementById("routineForm");
+        const routineNameDisplay = document.getElementById("routineNameDisplay");
+        const editRoutineNameBtn = document.getElementById("editRoutineNameBtn");
+        const routineNameEditContainer = document.getElementById("routineNameEditContainer");
+        const routineNameInput = document.getElementById("routineNameInput");
+        const saveRoutineNameBtn = document.getElementById("saveRoutineNameBtn");
+        const routineNameError = document.getElementById("routineNameError");
+        const missionsContainer = document.getElementById("missionsContainer");
+        const openAddMissionModalBtn = document.getElementById("openAddMissionModalBtn");
+        const missionModal = document.getElementById("missionModal");
+        const missionForm = document.getElementById("missionForm");
+        const missionNameInput = document.getElementById("missionName");
+        const missionTimeInput = document.getElementById("missionTime");
+        const missionNameError = document.getElementById("missionNameError");
+        const missionTimeError = document.getElementById("missionTimeError");
+        const deleteRoutineBtn = document.getElementById("deleteRoutineBtn");
+        const confirmDeleteModal = document.getElementById("confirmDeleteModal");
+        const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+        const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+
+        let currentUser = null;
+        let currentRoutineId = 'currentRoutine'; // Vous pouvez générer des IDs uniques si nécessaire
+        let missions = {};
+
+        // Fonction pour afficher une erreur
+        function displayError(element, message) {
+            element.innerText = message;
+            element.style.display = 'block';
+        }
+
+        // Fonction pour effacer une erreur
+        function clearError(element) {
+            element.innerText = '';
+            element.style.display = 'none';
+        }
+
+        // Fonction pour initialiser la routine
+        async function initializeRoutine(uid) {
+            const routineDocRef = doc(firestore, "users", uid, "routines", currentRoutineId);
+            const routineDocSnap = await getDoc(routineDocRef);
+
+            if (routineDocSnap.exists()) {
+                const routineData = routineDocSnap.data();
+                routineNameDisplay.innerText = routineData.name || 'Nom de la routine';
+                missions = routineData.missions || {};
+
+                // Afficher les missions
+                displayMissions();
+            } else {
+                // Si aucune routine n'existe, initialiser avec des valeurs par défaut
+                await setDoc(routineDocRef, { name: 'Nom de la routine', missions: {} });
+                routineNameDisplay.innerText = 'Nom de la routine';
+            }
+        }
+
+        // Fonction pour afficher les missions
+        function displayMissions() {
+            missionsContainer.innerHTML = '<h2>Missions</h2>';
+            for (const [missionId, mission] of Object.entries(missions)) {
+                const missionDiv = document.createElement('div');
+                missionDiv.classList.add('mission');
+                missionDiv.setAttribute('data-mission-id', missionId);
+                missionDiv.innerHTML = `
+                    <span>${mission.name} - ${mission.time}</span>
+                    <button type="button" class="edit-mission-btn"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="delete-mission-btn"><i class="fas fa-trash-alt"></i></button>
+                `;
+                missionsContainer.appendChild(missionDiv);
+            }
+
+            // Initialiser SortableJS pour le drag-and-drop
+            Sortable.create(missionsContainer, {
+                animation: 150,
+                onEnd: () => {
+                    // Optionnel : sauvegarder l'ordre des missions
+                    // Pour simplifier, cet exemple ne gère pas l'ordre
+                }
+            });
+
+            // Ajouter des écouteurs d'événements aux boutons d'édition et de suppression
+            const editButtons = missionsContainer.querySelectorAll('.edit-mission-btn');
+            editButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const missionDiv = e.target.closest('.mission');
+                    const missionId = missionDiv.getAttribute('data-mission-id');
+                    openEditMissionModal(missionId);
+                });
+            });
+
+            const deleteButtons = missionsContainer.querySelectorAll('.delete-mission-btn');
+            deleteButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const missionDiv = e.target.closest('.mission');
+                    const missionId = missionDiv.getAttribute('data-mission-id');
+                    openConfirmDeleteModal(missionId);
+                });
+            });
+        }
+
+        // Fonction pour ouvrir le modal d'ajout de mission
+        function openAddMissionModal() {
+            missionForm.reset();
+            clearError(missionNameError);
+            clearError(missionTimeError);
+            document.getElementById('modalTitle').innerText = 'Ajouter une Mission';
+            missionModal.style.display = 'block';
+            missionForm.setAttribute('data-mode', 'add');
+        }
+
+        // Fonction pour ouvrir le modal d'édition de mission
+        function openEditMissionModal(missionId) {
+            const mission = missions[missionId];
+            missionNameInput.value = mission.name;
+            missionTimeInput.value = mission.time;
+            clearError(missionNameError);
+            clearError(missionTimeError);
+            document.getElementById('modalTitle').innerText = 'Modifier une Mission';
+            missionModal.style.display = 'block';
+            missionForm.setAttribute('data-mode', 'edit');
+            missionForm.setAttribute('data-mission-id', missionId);
+        }
+
+        // Fonction pour ouvrir le modal de confirmation de suppression
+        function openConfirmDeleteModal(missionId) {
+            confirmDeleteModal.style.display = 'block';
+            confirmDeleteModal.setAttribute('data-mission-id', missionId);
+        }
+
+        // Fonction pour fermer les modals
+        function closeModals() {
+            missionModal.style.display = 'none';
+            confirmDeleteModal.style.display = 'none';
+        }
+
+        // Gestion des événements des boutons de fermeture des modals
+        document.querySelectorAll('.close').forEach(span => {
+            span.addEventListener('click', closeModals);
+        });
+
+        // Gestion de la soumission du formulaire de mission
+        missionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError(missionNameError);
+            clearError(missionTimeError);
+
+            const name = missionNameInput.value.trim();
+            const time = missionTimeInput.value;
+
+            let hasError = false;
+
+            if (name === '') {
+                displayError(missionNameError, 'Veuillez entrer le nom de la mission.');
+                hasError = true;
+            }
+
+            if (time === '') {
+                displayError(missionTimeError, 'Veuillez entrer l\'heure de la mission.');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            const mode = missionForm.getAttribute('data-mode');
+            if (mode === 'add') {
+                // Générer un ID unique pour la mission
+                const missionId = `mission_${Date.now()}`;
+                missions[missionId] = { name, time };
+            } else if (mode === 'edit') {
+                const missionId = missionForm.getAttribute('data-mission-id');
+                if (missionId && missions[missionId]) {
+                    missions[missionId].name = name;
+                    missions[missionId].time = time;
+                }
+            }
+
+            // Sauvegarder les missions dans Firestore
+            if (currentUser) {
+                const uid = currentUser.uid;
+                const routineDocRef = doc(firestore, "users", uid, "routines", currentRoutineId);
+                await setDoc(routineDocRef, { missions }, { merge: true });
+                displayMissions();
+            }
+
+            closeModals();
+        });
+
+        // Gestion de la confirmation de suppression
+        confirmDeleteBtn.addEventListener('click', async () => {
+            const missionId = confirmDeleteModal.getAttribute('data-mission-id');
+            if (missionId && missions[missionId]) {
+                delete missions[missionId];
+
+                // Sauvegarder les missions dans Firestore
+                if (currentUser) {
+                    const uid = currentUser.uid;
+                    const routineDocRef = doc(firestore, "users", uid, "routines", currentRoutineId);
+                    await setDoc(routineDocRef, { missions }, { merge: true });
+                    displayMissions();
+                }
+
+                closeModals();
+            } else if (missionId === 'routine') {
+                if (currentUser) {
+                    const uid = currentUser.uid;
+                    const routineDocRef = doc(firestore, "users", uid, "routines", currentRoutineId);
+                    await deleteDoc(routineDocRef);
+                    // Rediriger vers la page de routine après suppression
+                    window.location.href = "../routine/routine.html";
+                }
+            }
+        });
+
+        // Gestion du bouton pour ajouter une mission
+        openAddMissionModalBtn.addEventListener('click', openAddMissionModal);
+
+        // Gestion du bouton d'édition du nom de la routine
+        editRoutineNameBtn.addEventListener('click', () => {
+            routineNameEditContainer.style.display = 'block';
+            routineNameDisplay.style.display = 'none';
+        });
+
+        // Gestion du bouton de sauvegarde du nom de la routine
+        saveRoutineNameBtn.addEventListener('click', async () => {
+            const newName = routineNameInput.value.trim();
+            clearError(routineNameError);
+
+            if (newName === '') {
+                displayError(routineNameError, 'Veuillez entrer un nom pour la routine.');
+                return;
+            }
+
+            if (currentUser) {
+                const uid = currentUser.uid;
+                const routineDocRef = doc(firestore, "users", uid, "routines", currentRoutineId);
+                await setDoc(routineDocRef, { name: newName }, { merge: true });
+                routineNameDisplay.innerText = newName;
+            }
+
+            routineNameEditContainer.style.display = 'none';
+            routineNameDisplay.style.display = 'block';
+        });
+
+        // Gestion du bouton de suppression de la routine
+        deleteRoutineBtn.addEventListener('click', () => {
+            openConfirmDeleteModal('routine');
+        });
+
+        // Écouter l'état d'authentification
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                initializeRoutine(user.uid);
+            } else {
+                // Rediriger vers la page de connexion si l'utilisateur n'est pas authentifié
+                window.location.href = "../signin.html";
+            }
+        });
+    </script>
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="../routine/routine.html"><i class="fas fa-arrow-left"></i> Retour à la Routine</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h1>Créer ou Modifier une Routine</h1>
+    </header>
+
+    <main>
+        <form id="routineForm">
+            <div class="routine-name-container">
+                <h2 id="routineNameDisplay">Nom de la routine</h2>
+                <button type="button" id="editRoutineNameBtn" class="edit-routine-name-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+            <!-- Champ caché pour modifier le nom de la routine -->
+            <div id="routineNameEditContainer" style="display: none;">
+                <input type="text" id="routineNameInput" placeholder="Nom de la routine" required>
+                <button type="button" id="saveRoutineNameBtn" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                </button>
+            </div>
+            <span class="error-message" id="routineNameError" style="display: none;"></span>
+
+            <div id="missionsContainer">
+                <h2>Missions</h2>
+                <!-- Liste des missions ajoutées dynamiquement -->
+            </div>
+
+            <!-- Conteneur pour les boutons -->
+            <div class="buttons-container">
+                <button type="button" id="openAddMissionModalBtn" class="btn-primary large-btn">
+                    <i class="fas fa-plus"></i> Ajouter une mission
+                </button>
+                <button type="button" id="deleteRoutineBtn" class="btn-danger large-btn">
+                    <i class="fas fa-trash-alt"></i> Supprimer la routine
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Modal pour Ajouter/Modifier une Mission -->
+    <div id="missionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Ajouter une Mission</h2>
+            <form id="missionForm">
+                <label for="missionName">Nom de la mission :</label>
+                <input type="text" id="missionName" placeholder="Nom de la mission" required>
+                <span class="error-message" id="missionNameError" style="display: none;"></span>
+
+                <label for="missionTime">Heure :</label>
+                <input type="time" id="missionTime" required>
+                <span class="error-message" id="missionTimeError" style="display: none;"></span>
+
+                <button type="submit" class="btn-primary large-btn">
+                    <i class="fas fa-check-circle"></i> Enregistrer
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour la Confirmation de Suppression -->
+    <div id="confirmDeleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close close-confirm-modal">&times;</span>
+            <h2>Confirmer la suppression</h2>
+            <p>Voulez-vous vraiment supprimer cette mission ?</p>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="btn-danger">Supprimer</button>
+                <button id="cancelDeleteBtn" class="btn-primary">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inclusion du fichier JavaScript -->
+    <!-- Le script est déjà inclus dans le head via module -->
+</body>
+</html>

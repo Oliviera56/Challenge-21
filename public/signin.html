@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <!-- Métadonnées -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge 21 - Connexion</title>
+  <meta name="description" content="Challenge 21 - Connectez-vous pour suivre votre routine quotidienne de manière simple et efficace.">
+  <meta name="keywords" content="Challenge 21, connexion, routine, productivité, suivi, efficace">
+  <meta name="author" content="VotreNom">
+
+  <!-- Liens vers les polices et les icônes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Feuilles de style Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Styles personnalisés -->
+  <style>
+    /* Styles similaires à signup.html pour cohérence */
+    :root {
+      --background-color: #0a0a0a;
+      --text-color: #fff;
+      --primary-color: #28a745;
+      --highlight-color: #28a745;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 16px; /* Taille de police de base */
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background-color: rgba(10, 10, 10, 0.85);
+      padding: 15px 0;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    nav .navbar-brand {
+      font-weight: 700;
+      color: var(--primary-color) !important;
+      font-size: 1.5rem;
+    }
+
+    nav .nav-link {
+      color: var(--text-color) !important;
+      font-weight: 500;
+      margin-left: 20px;
+      transition: color 0.3s ease;
+    }
+
+    nav .nav-link:hover {
+      color: var(--highlight-color) !important;
+    }
+
+    /* Conteneur principal */
+    .container {
+      flex: 1;
+      text-align: center;
+      max-width: 500px;
+      padding-top: 100px;
+      margin: auto;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(8.5px);
+      -webkit-backdrop-filter: blur(8.5px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      opacity: 0;
+      transform: translateY(50px);
+      animation: fadeInUp 1s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      opacity: 0;
+      transform: translateX(50px);
+      animation: slideInRight 1s ease-out forwards;
+      animation-delay: 0.5s;
+    }
+
+    @keyframes slideInRight {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .btn-futuristic {
+      background-color: var(--highlight-color);
+      color: #fff;
+      border: 2px solid var(--highlight-color);
+      padding: 10px 30px;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      opacity: 0;
+      transform: scale(0.95);
+      animation: fadeInScale 1s ease-out forwards;
+      animation-delay: 1.5s;
+    }
+
+    .btn-futuristic::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 100%;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      z-index: -1;
+      transition: right 0.5s ease-out;
+    }
+
+    .btn-futuristic:hover {
+      background-color: #1e7e34;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-futuristic:hover::before {
+      right: 0;
+    }
+
+    #error-message {
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+
+    #error-message.visible {
+      opacity: 1;
+    }
+
+    .form-label {
+      text-align: left;
+      color: var(--text-color);
+    }
+
+    /* Pied de page */
+    footer {
+      background-color: rgba(10, 10, 10, 0.9);
+      text-align: center;
+      padding: 10px 0;
+      color: var(--text-color);
+      font-size: small;
+      /* Retirer position fixed */
+      /* position: fixed; */
+      bottom: 0;
+      width: 100%;
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    /* Animations */
+    @keyframes fadeInScale {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* Responsivité */
+    @media (max-height: 600px) {
+      .container {
+        padding-top: 5vh;
+      }
+
+      .form-container {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      body {
+        font-size: 14px;
+      }
+
+      .btn-futuristic {
+        font-size: 1rem;
+        padding: 8px 20px;
+      }
+    }
+
+    @media (max-width: 992px) {
+      .form-container {
+        padding: 30px;
+      }
+
+      .btn-futuristic {
+        padding: 8px 24px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav .navbar-brand {
+        font-size: 1.3rem;
+      }
+
+      nav .nav-link {
+        margin-left: 15px;
+        font-size: 0.9rem;
+      }
+
+      .form-container {
+        padding: 25px;
+      }
+
+      .btn-futuristic {
+        padding: 6px 20px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      nav .navbar-brand {
+        font-size: 1.1rem;
+      }
+
+      nav .nav-link {
+        margin-left: 10px;
+        font-size: 0.8rem;
+      }
+
+      .form-container {
+        padding: 20px;
+      }
+
+      .btn-futuristic {
+        padding: 5px 16px;
+        font-size: 0.8rem;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Barre de navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="accueil.html">Challenge 21</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Basculer la navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" href="signup.html">S'inscrire</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="signin.html">Se connecter</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenu principal -->
+  <div class="container">
+    <div class="form-container">
+      <h2 class="display-5 mb-4">Se connecter</h2>
+      <!-- Formulaire avec l'ID loginForm -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email" class="form-label">Email :</label>
+          <input type="email" id="email" class="form-control" placeholder="Entrer votre email">
+        </div>
+        <div class="form-group">
+          <label for="password" class="form-label">Mot de passe :</label>
+          <input type="password" id="password" class="form-control" placeholder="Entrer votre mot de passe">
+        </div>
+        <!-- Bouton de soumission avec type="submit" -->
+        <button id="loginButton" type="submit" class="btn btn-futuristic">Se connecter</button>
+        <p id="error-message" class="text-danger mt-3"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pied de page -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 Challenge 21. Tous droits réservés.</p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK et scripts -->
+  <script type="module">
+    // Importer les fonctions nécessaires de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+    // Configuration Firebase (Vos informations)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAyk8bXkga9trYpjnLsSGV5RVjLyIH6HIs",
+      authDomain: "challenge-21-5dc3b.firebaseapp.com",
+      projectId: "challenge-21-5dc3b",
+      storageBucket: "challenge-21-5dc3b.appspot.com",
+      messagingSenderId: "1055997037321",
+      appId: "1:1055997037321:web:64e2b003c74ee516ef61d8",
+      measurementId: "G-1YPYR46K7N"
+    };
+
+    // Initialiser Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const firestore = getFirestore(app);
+
+    // Références aux éléments du DOM
+    const loginForm = document.getElementById("loginForm");
+    const errorMessage = document.getElementById("error-message");
+
+    // Fonctions pour gérer les messages d'erreur
+    function displayError(message) {
+      errorMessage.innerText = message;
+      errorMessage.classList.add("visible");
+    }
+
+    function clearError() {
+      errorMessage.innerText = "";
+      errorMessage.classList.remove("visible");
+    }
+
+    // Fonction de connexion
+    loginForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      clearError();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (email === "" || password === "") {
+        displayError("Veuillez remplir tous les champs.");
+        return;
+      }
+
+      try {
+        // Connexion avec Firebase Authentication
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Vérifier si l'utilisateur existe dans Firestore (optionnel)
+        const userDocRef = doc(firestore, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          // Rediriger vers routine/routine.html après connexion réussie
+          window.location.href = "routine/routine.html";
+        } else {
+          displayError("Utilisateur non trouvé dans la base de données.");
+        }
+
+      } catch (error) {
+        console.error("Erreur lors de la connexion :", error);
+        displayError(error.message);
+      }
+    });
+
+    // Redirection automatique si l'utilisateur est déjà connecté
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "routine/routine.html";
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Habitudes</title>
+    <link rel="stylesheet" href="wlhabit.css">
+    <!-- Inclusion de FontAwesome pour les icônes (optionnel) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<nav class="navbar">
+    <ul>
+        <li><a href="../todolist/todolist.html">To-Do List</a></li>
+        <li><a href="../routine/routine.html">Routine</a></li>
+        <li><a href="../wlhabit/wlhabit.html">Habitude</a></li>
+    </ul>
+</nav>
+
+<header>
+    <h1>Suivi des Habitudes</h1>
+</header>
+
+<main>
+    <form id="habitForm">
+        <input type="text" id="habitName" placeholder="Nom de l'habitude" required>
+        <select id="habitType">
+            <option value="prendre">Prendre une habitude</option>
+            <option value="perdre">Perdre une habitude</option>
+        </select>
+        <button type="submit" id="addHabit">Ajouter l'habitude</button>
+    </form>
+    <div id="habitStatus"></div>
+    <ul id="habitList">
+        <!-- Habitudes seront ajoutées ici dynamiquement -->
+    </ul>
+</main>
+
+<!-- Inclusion du fichier JavaScript Firebase Config -->
+<script type="module" src="../js/firebase-config.js"></script>
+
+<!-- Inclusion du fichier JavaScript pour Habitudes -->
+<script type="module" src="../js/wlhabit.js"></script>
+</body>
+</html>
