@@ -51,15 +51,15 @@
 
     <!-- JavaScript Intégré -->
     <script>
-    // Votre configuration Firebase
+    // Votre configuration Firebase (non censurée)
     const firebaseConfig = {
-        apiKey: "AIzaSyAyk8bXkga9trYpjnLsSGV5RVjLyIH6HIs",
-        authDomain: "challenge-21-5dc3b.firebaseapp.com",
-        projectId: "challenge-21-5dc3b",
-        storageBucket: "challenge-21-5dc3b.appspot.com",
-        messagingSenderId: "1055997037321",
-        appId: "1:1055997037321:web:64e2b003c74ee516ef61d8",
-        measurementId: "G-1YPYR46K7N"
+      apiKey: "AIzaSyAyk8bXkga9trYpjnLsSGV5RVjLyIH6HIs",
+      authDomain: "challenge-21-5dc3b.firebaseapp.com",
+      projectId: "challenge-21-5dc3b",
+      storageBucket: "challenge-21-5dc3b.appspot.com",
+      messagingSenderId: "1055997037321",
+      appId: "1:1055997037321:web:64e2b003c74ee516ef61d8",
+      measurementId: "G-1YPYR46K7N"
     };
 
     // Initialiser Firebase
@@ -69,16 +69,11 @@
     // Initialiser Firestore
     const db = firebase.firestore();
 
-    // Déclaration de routineData en dehors pour une portée globale
-    let routineData = {
-        days: []
-    };
+    let routineData = { days: [] };
 
-    // Fonction pour initialiser les données de routine par défaut à partir des missions de la routine
     function initializeRoutineData(missions) {
         let defaultData = { days: [] };
         for (let i = 1; i <= 21; i++) {
-            // Clone des missions de la routine avec le statut 'neutral'
             const clonedMissions = missions.map(mission => ({
                 name: mission.name,
                 time: mission.time,
@@ -92,12 +87,18 @@
         return defaultData;
     }
 
-    // Fonction pour sauvegarder routineData dans le localStorage
     function saveRoutineData() {
         localStorage.setItem('routineData', JSON.stringify(routineData));
     }
 
-    // Fonction pour récupérer les missions depuis Firestore
+    function loadRoutineData() {
+        const data = localStorage.getItem('routineData');
+        if (data) {
+            return JSON.parse(data);
+        }
+        return null;
+    }
+
     async function fetchMissionsFromFirestore() {
         try {
             const routinesSnapshot = await db.collection('routines').limit(1).get();
@@ -119,58 +120,48 @@
         }
     }
 
-    // Fonction pour initialiser la routine à partir de Firestore
     async function initializeRoutine() {
-        const missions = await fetchMissionsFromFirestore();
-        if (missions.length === 0) {
-            // Aucune mission trouvée, réinitialiser les tâches
-            resetAllTasks();
-            return;
+        const localData = loadRoutineData();
+        if (localData && localData.days && localData.days.length > 0) {
+            routineData = localData;
+            displayRoutineGrid();
+            updateGlobalPercentage();
+        } else {
+            const missions = await fetchMissionsFromFirestore();
+            if (missions.length === 0) {
+                resetAllTasks();
+                return;
+            }
+            routineData = initializeRoutineData(missions);
+            saveRoutineData();
+            displayRoutineGrid();
+            updateGlobalPercentage();
         }
-
-        // Initialiser routineData avec les missions récupérées
-        routineData = initializeRoutineData(missions);
-        saveRoutineData();
-
-        // Afficher les cases pour chaque jour
-        displayRoutineGrid();
-
-        // Mise à jour du pourcentage global
-        updateGlobalPercentage();
     }
 
-    // Fonction pour afficher les cases pour chaque jour
     function displayRoutineGrid() {
         const routineGrid = document.getElementById('routineGrid');
-        routineGrid.innerHTML = ''; // Vider le contenu existant
+        routineGrid.innerHTML = '';
 
         routineData.days.forEach((dayData, index) => {
             const dayDiv = document.createElement('div');
             dayDiv.classList.add('routine-day');
-            dayDiv.style.setProperty('--delay', index); // Ajout pour l'animation
-
-            // Ajouter un attribut data-day-index pour une identification unique
+            dayDiv.style.setProperty('--delay', index);
             dayDiv.setAttribute('data-day-index', index);
 
-            // Ajouter le titre du jour
             const dayTitle = document.createElement('h2');
             dayTitle.textContent = `Jour ${dayData.day}`;
             dayDiv.appendChild(dayTitle);
 
-            // Ajouter un élément pour afficher le pourcentage
             const percentageSpan = document.createElement('span');
             percentageSpan.classList.add('day-percentage');
             dayDiv.appendChild(percentageSpan);
-
-            // Mettre à jour le pourcentage du jour
             updateDayPercentage(dayData, index);
 
-            // Rendre chaque case cliquable pour ouvrir les missions
             dayDiv.addEventListener('click', function () {
                 openFullScreen(dayDiv, index);
             });
 
-            // Ajouter également un écouteur pour les appareils tactiles
             dayDiv.addEventListener('touchstart', function () {
                 openFullScreen(dayDiv, index);
             });
@@ -179,14 +170,10 @@
         });
     }
 
-    // Événement déclenché lorsque le contenu du DOM est entièrement chargé
     document.addEventListener('DOMContentLoaded', function () {
         const resetButton = document.getElementById('resetButton');
-
-        // Initialiser la routine en récupérant les missions depuis Firestore
         initializeRoutine();
 
-        // Ajout de l'écouteur pour le bouton de réinitialisation
         if (resetButton) {
             resetButton.addEventListener('click', function () {
                 if (confirm('Voulez-vous vraiment réinitialiser toutes les tâches ?')) {
@@ -196,28 +183,20 @@
         }
     });
 
-    // Fonction pour afficher la case en plein écran avec les missions spécifiques du jour
     function openFullScreen(dayDiv, dayIndex) {
-        // Créer une nouvelle page en plein écran
         const fullScreenDiv = document.createElement('div');
         fullScreenDiv.classList.add('full-screen');
-
-        // Empêcher le défilement de la page en arrière-plan
         document.body.style.overflow = 'hidden';
 
-        // Récupérer les missions spécifiques pour le jour sélectionné
         const dayMissions = routineData.days[dayIndex].missions;
         if (!dayMissions || dayMissions.length === 0) {
             fullScreenDiv.innerHTML = `<h2>Jour ${routineData.days[dayIndex].day}</h2><p>Aucune mission pour ce jour.</p>`;
         } else {
-            // Récupérer et afficher les missions
             let missionsHtml = dayMissions.map((mission, index) => {
                 let missionClass = '';
-                if (mission.status === 'completed') {
-                    missionClass = 'validated';
-                } else if (mission.status === 'failed') {
-                    missionClass = 'failed';
-                }
+                if (mission.status === 'completed') missionClass = 'validated';
+                else if (mission.status === 'failed') missionClass = 'failed';
+
                 return `
                     <div class="mission-item ${missionClass}" data-index="${index}" data-day-index="${dayIndex}" style="--delay: ${index}">
                         <h3>${mission.name}</h3>
@@ -234,9 +213,7 @@
 
         document.body.appendChild(fullScreenDiv);
 
-        // Gérer les interactions avec les missions pour ce jour spécifique
         fullScreenDiv.querySelectorAll('.mission-item').forEach(item => {
-            // Détection du survol pour déterminer la partie validée ou échouée
             item.addEventListener('mousemove', function (e) {
                 const rect = this.getBoundingClientRect();
                 const relativeX = e.clientX - rect.left;
@@ -250,7 +227,6 @@
                 }
             });
 
-            // Détection des mouvements tactiles pour les appareils mobiles
             item.addEventListener('touchmove', function (e) {
                 const touch = e.touches[0];
                 const rect = this.getBoundingClientRect();
@@ -265,102 +241,77 @@
                 }
             });
 
-            // Réinitialiser les classes lors du retrait du curseur
             item.addEventListener('mouseleave', function () {
                 this.classList.remove('hover-validated');
                 this.classList.remove('hover-failed');
             });
 
-            // Événement de clic pour changer le statut de la mission
-            item.addEventListener('click', function (event) { // Ajout de 'event' en paramètre
+            item.addEventListener('click', function (event) {
                 const missionIndex = parseInt(this.getAttribute('data-index'), 10);
                 const dayIdx = parseInt(this.getAttribute('data-day-index'), 10);
                 const currentStatus = routineData.days[dayIdx].missions[missionIndex].status;
 
-                // Déterminer où l'utilisateur a cliqué
                 const rect = this.getBoundingClientRect();
                 const clickX = event.clientX - rect.left;
                 const midPoint = rect.width / 2;
 
                 if (clickX < midPoint) {
-                    // Partie gauche : valider
                     if (currentStatus === 'completed') {
-                        // Remettre à neutre
                         routineData.days[dayIdx].missions[missionIndex].status = 'neutral';
                         this.classList.remove('validated');
                     } else {
-                        // Marquer comme complété
                         routineData.days[dayIdx].missions[missionIndex].status = 'completed';
                         this.classList.add('validated');
                         this.classList.remove('failed');
                     }
                 } else {
-                    // Partie droite : échouer
                     if (currentStatus === 'failed') {
-                        // Remettre à neutre
                         routineData.days[dayIdx].missions[missionIndex].status = 'neutral';
                         this.classList.remove('failed');
                     } else {
-                        // Marquer comme échoué
                         routineData.days[dayIdx].missions[missionIndex].status = 'failed';
                         this.classList.add('failed');
                         this.classList.remove('validated');
                     }
                 }
 
-                // Sauvegarder les changements dans le localStorage
                 saveRoutineData();
-
-                // Mettre à jour le pourcentage du jour
                 updateDayPercentage(routineData.days[dayIdx], dayIdx);
-
-                // Mettre à jour le pourcentage global
                 updateGlobalPercentage();
             });
 
-            // Gestion des interactions tactiles pour les appareils mobiles
             item.addEventListener('touchend', function () {
                 this.classList.remove('hover-validated');
                 this.classList.remove('hover-failed');
             });
         });
 
-        // Ajouter un événement pour fermer le plein écran en cliquant en dehors des missions
         fullScreenDiv.addEventListener('click', function (e) {
             if (e.target === fullScreenDiv) {
                 document.body.removeChild(fullScreenDiv);
-                // Rétablir le défilement de la page en arrière-plan
                 document.body.style.overflow = '';
             }
         });
     }
 
-    // Fonction pour calculer le pourcentage de progression d'un jour
     function calculateDayProgress(missions) {
         const totalMissions = missions.length;
-        const completedMissions = missions.filter(mission => mission.status === 'completed').length;
-
-        // Calcul du pourcentage de tâches réussies pour le jour
+        const completedMissions = missions.filter(m => m.status === 'completed').length;
         const dayProgress = (completedMissions / totalMissions) * 100;
-
-        return parseFloat(dayProgress.toFixed(1)); // Un chiffre après la virgule
+        return parseFloat(dayProgress.toFixed(1));
     }
 
-    // Fonction pour mettre à jour le pourcentage d'un jour
     function updateDayPercentage(dayData, dayIndex) {
         const dayDiv = document.querySelector(`.routine-day[data-day-index="${dayIndex}"]`);
         if (dayDiv) {
             const percentageSpan = dayDiv.querySelector('.day-percentage');
-
             const progress = calculateDayProgress(dayData.missions);
-
             percentageSpan.textContent = `${progress}%`;
         }
     }
 
-    // Fonction pour mettre à jour le pourcentage global
     function updateGlobalPercentage() {
-        const successArray = []; // Tableau pour stocker les "1" (succès) et les "0" (échecs)
+        const successArray = [];
 
         routineData.days.forEach(day => {
             day.missions.forEach(mission => {
@@ -369,7 +320,6 @@
                 } else if (mission.status === 'failed') {
                     successArray.push(0);
                 }
-                // Si le statut est "neutral", on ne l'inclut pas dans le calcul
             });
         });
 
@@ -378,45 +328,29 @@
         const globalPercentageSpan = document.getElementById('globalPercentage');
 
         if (successArray.length === 0) {
-            // Aucun progrès
             globalProgressBar.style.width = '0%';
-            if (globalPercentageSpan) {
-                globalPercentageSpan.textContent = '0.0%';
-            }
+            if (globalPercentageSpan) globalPercentageSpan.textContent = '0.0%';
         } else {
-            let globalProgress;
-
-            // Calculer le pourcentage de "1" par rapport au total des "1" et "0"
             const totalTasks = successArray.length;
             const totalSuccess = successArray.filter(val => val === 1).length;
-            globalProgress = (totalSuccess / totalTasks) * 100;
-
-            globalProgress = parseFloat(globalProgress.toFixed(1)); // Un chiffre après la virgule
-
-            // Afficher la barre de progression globale
+            let globalProgress = (totalSuccess / totalTasks) * 100;
+            globalProgress = parseFloat(globalProgress.toFixed(1));
             globalProgressBar.style.width = `${globalProgress}%`;
-
-            if (globalPercentageSpan) {
-                globalPercentageSpan.textContent = `${globalProgress}%`;
-            }
+            if (globalPercentageSpan) globalPercentageSpan.textContent = `${globalProgress}%`;
         }
 
-        // La barre de progression globale reste toujours visible
         if (globalProgressBarContainer) {
             globalProgressBarContainer.style.display = 'block';
         }
     }
 
-    // Fonction pour réinitialiser toutes les tâches à l'état "neutral"
     async function resetAllTasks() {
-        // Récupérer la routine pour obtenir les missions par défaut depuis Firestore
         const missions = await fetchMissionsFromFirestore();
         if (missions.length === 0) {
             console.error("Aucune mission trouvée pour réinitialiser.");
             return;
         }
 
-        // Parcourir toutes les tâches et les remettre à l'état "neutral"
         routineData.days = [];
         for (let i = 1; i <= 21; i++) {
             const clonedMissions = missions.map(mission => ({
@@ -430,18 +364,11 @@
             });
         }
 
-        // Sauvegarder les changements dans le localStorage
         saveRoutineData();
-
-        // Mettre à jour les pourcentages pour chaque jour
         routineData.days.forEach((dayData, index) => {
             updateDayPercentage(dayData, index);
         });
-
-        // Mettre à jour le pourcentage global
         updateGlobalPercentage();
-
-        // Rafraîchir l'affichage des cases
         displayRoutineGrid();
     }
     </script>

@@ -296,8 +296,8 @@
       <h1 class="title">Challenge 21</h1>
       <p class="lead">Prenez le contrôle de votre quotidien avec un outil <span class="highlight">simple</span> et
         <span class="highlight">efficace</span>.</p>
-      <!-- Bouton pour ouvrir le modal -->
-      <button id="startButton" class="btn btn-futuristic" data-bs-toggle="modal" data-bs-target="#emailModal">Commencer maintenant</button>
+      <!-- Bouton avec logique de redirection basée sur l'authentification -->
+      <button id="startButton" class="btn btn-futuristic">Commencer maintenant</button>
     </div>
   </main>
 
@@ -308,37 +308,12 @@
     </div>
   </footer>
 
-  <!-- Modal de Vérification de l'Email -->
-  <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content bg-dark text-white">
-        <div class="modal-header">
-          <h5 class="modal-title" id="emailModalLabel">Commencer</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-        </div>
-        <div class="modal-body">
-          <form id="emailForm">
-            <div class="mb-3">
-              <label for="userEmail" class="form-label">Adresse Email</label>
-              <input type="email" class="form-control" id="userEmail" required>
-            </div>
-            <div id="emailError" class="text-danger mb-3" style="display: none;">Veuillez entrer une adresse email valide.</div>
-            <button type="submit" class="btn btn-primary">Vérifier</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Inclusion des fichiers JavaScript -->
-  <!-- Inclusion du fichier JavaScript Firebase Config (si vous souhaitez externaliser) -->
-  <!-- <script type="module" src="js/firebase-config.js"></script> -->
-
-  <!-- Inclusion du script inline pour la logique de la page d'accueil -->
+  <!-- Firebase JS SDK -->
   <script type="module">
     // Importer les fonctions nécessaires de Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, fetchSignInMethodsForEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
     // Configuration Firebase (Vos informations)
     const firebaseConfig = {
@@ -356,57 +331,29 @@
     const auth = getAuth(app);
 
     // Références aux éléments du DOM
-    const emailForm = document.getElementById("emailForm");
-    const userEmailInput = document.getElementById("userEmail");
-    const emailError = document.getElementById("emailError");
-    const emailModalElement = document.getElementById('emailModal');
-    const emailModal = new bootstrap.Modal(emailModalElement);
+    const startButton = document.getElementById("startButton");
 
-    // Fonction de validation de l'email
-    function validateEmail(email) {
-      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return re.test(String(email).toLowerCase());
-    }
-
-    // Gestion de la soumission du formulaire d'email
-    emailForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = userEmailInput.value.trim();
-
-      // Validation de l'email
-      if (!email || !validateEmail(email)) {
-        emailError.textContent = "Veuillez entrer une adresse email valide.";
-        emailError.style.display = "block";
-        return;
-      }
-
-      try {
-        // Vérifier les méthodes de connexion pour l'email donné
-        const methods = await fetchSignInMethodsForEmail(auth, email);
-
-        if (methods.length > 0) {
-          // L'email est déjà enregistré, rediriger vers la page de connexion
-          emailModal.hide();
-          window.location.href = "signin.html";
-        } else {
-          // L'email n'est pas enregistré, rediriger vers la page d'inscription
-          emailModal.hide();
-          window.location.href = "signup.html";
-        }
-      } catch (error) {
-        console.error("Erreur lors de la vérification de l'email :", error);
-        emailError.textContent = "Une erreur est survenue. Veuillez réessayer.";
-        emailError.style.display = "block";
+    // Fonction pour vérifier l'état d'authentification et rediriger
+    startButton.addEventListener("click", () => {
+      const user = auth.currentUser;
+      if (user) {
+        // Utilisateur connecté, rediriger vers la page de routine
+        window.location.href = "routine/routine.html";
+      } else {
+        // Utilisateur non connecté, rediriger vers la page de connexion
+        window.location.href = "signin.html";
       }
     });
 
-    // Gestion de l'état d'authentification de l'utilisateur
-    onAuthStateChanged(auth, (user) => {
+    // Optionnel : Vérifier l'état d'authentification au chargement de la page
+    // Si vous souhaitez rediriger automatiquement sans cliquer sur le bouton
+    /*
+    auth.onAuthStateChanged((user) => {
       if (user) {
-        // Si l'utilisateur est connecté, rediriger vers routine/routine.html
         window.location.href = "routine/routine.html";
       }
     });
+    */
   </script>
 
   <!-- Bootstrap JS -->
